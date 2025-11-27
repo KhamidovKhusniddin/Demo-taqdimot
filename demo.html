@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Navbat Boshqaruvi Tizimi </title>
+    <!-- Tailwind CSS (Aesthetics are crucial, using custom CSS for a better presentation) -->
+    <style>
+        /* Umumiy uslublar */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f7f6;
+        }
+        
+        /* Navigatsiya paneli */
+        .navbar {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); /* To'q ko'k */
+            color: white;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .navbar h1 { font-size: 1.5em; font-weight: 700; }
+        .nav-links { display: flex; gap: 1.5rem; }
+        .nav-links a { 
+            color: white; 
+            text-decoration: none; 
+            transition: 0.3s; 
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .nav-links a:hover { 
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #6366f1;
+        }
+        
+        /* Sarlavha qismi (Hero) */
+        .hero {
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); /* Ko'k-binafsha gradient */
+            color: white;
+            padding: 80px 20px 100px 20px;
+            text-align: center;
+            clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+        }
+        
+        .hero h2 { font-size: 3em; margin-bottom: 10px; font-weight: 800; }
+        .hero p { font-size: 1.2em; margin-bottom: 30px; max-width: 900px; margin-left: auto; margin-right: auto; opacity: 0.9; }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px 40px 20px; position: relative; z-index: 10; }
+        
+        /* Bo'limlar */
+        .section {
+            margin-bottom: 60px;
+            padding: 40px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+
+        .section:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
+        
+        .section h2 {
+            color: #4f46e5;
+            font-size: 2.2em;
+            margin-bottom: 30px;
+            border-bottom: 4px solid #a5b4fc;
+            padding-bottom: 10px;
+            font-weight: 700;
+        }
+
+        /* Sub-headings for clarity */
+        .section h3 {
+            color: #1e3a8a;
+            font-size: 1.6em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 5px solid #6366f1;
+            padding-left: 10px;
+            font-weight: 600;
+        }
+
+        /* Problem & Solution Grid */
+        .problem-solution-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .problem-box, .solution-box {
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .problem-box {
+            background: #fee2e2; /* Qizil rangga yaqin */
+            border-left: 5px solid #ef4444;
+        }
+
+        .solution-box {
+            background: #d1fae5; /* Yashil rangga yaqin */
+            border-left: 5px solid #10b981;
+        }
+        
+        /* Team Grid */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        .team-member {
+            background: #f1f5f9; /* Ochiq kulrang */
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: 0.3s;
+        }
+
+        .team-member:hover {
+             background: #e2e8f0;
+        }
+        
+        .team-member h4 { color: #4f46e5; font-size: 1.4em; margin-bottom: 5px; }
+        .team-member .role { color: #10b981; font-weight: 600; display: block; margin-bottom: 10px; }
+        .team-member .skills-list { 
+            background: white; 
+            padding: 10px; 
+            border-radius: 5px; 
+            margin-top: 15px; 
+            font-size: 0.9em;
+            border: 1px dashed #94a3b8;
+        }
+        
+        /* Roadmap */
+        .roadmap-grid {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-top: 30px;
+            padding: 20px;
+            background: #eef2ff;
+            border-radius: 8px;
+        }
+
+        .roadmap-item {
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+            position: relative;
+        }
+
+        .roadmap-dot {
+            width: 20px;
+            height: 20px;
+            background: #cbd5e1;
+            border-radius: 50%;
+            margin: 0 auto 10px auto;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #cbd5e1;
+        }
+
+        .roadmap-item.active .roadmap-dot {
+            background: #10b981;
+            box-shadow: 0 0 0 4px #d1fae5;
+        }
+
+        .roadmap-line {
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            right: -50%;
+            height: 3px;
+            background: #cbd5e1;
+            z-index: 1;
+        }
+
+        .roadmap-item:last-child .roadmap-line { display: none; }
+
+        .roadmap-status { font-weight: 600; color: #4f46e5; margin-top: 5px; }
+
+        /* Tech Approach */
+        .approach-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        .approach-list li {
+            background: #f8fafc;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #93c5fd;
+            font-size: 1.05em;
+        }
+
+        .tech-stack-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .tech-item {
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 8px;
+            border-top: 5px solid #4f46e5;
+        }
+
+        .tech-item h4 { color: #4f46e5; margin-bottom: 10px; }
+
+        /* AI Features Block */
+        .ai-features-block {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+        
+        .ai-features-block h3 { color: white; border-left-color: #93c5fd; }
+        .ai-features-block p { margin-top: 10px; font-size: 1.05em; opacity: 0.9; }
+
+        /* Chat Demo Section */
+        .chat-demo-section {
+            background: #fff;
+            border-radius: 20px;
+            padding: 50px 30px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-around;
+            gap: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            margin-top: 40px; /* Bo'limlarni ajratish */
+            position: relative;
+        }
+
+        .chat-demo-text {
+            flex: 1;
+            min-width: 300px;
+            max-width: 500px;
+        }
+
+        .chat-demo-text h2 {
+            color: #4f46e5;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .chat-demo-text p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        /* Telefon Maketi */
+        .phone-mockup {
+            width: 320px;
+            height: 580px;
+            background: #e6e6fa; 
+            border-radius: 35px;
+            border: 8px solid #333;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Telefon Sarlavhasi */
+        .phone-header {
+            background: #6366f1; /* Bot rangi */
+            color: white;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: #10b981; 
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .header-info h4 { font-size: 1em; margin: 0; color: white; }
+        .header-info span { font-size: 0.8em; color: #a7f3d0; }
+
+        /* Chat Maydoni */
+        .chat-area {
+            flex: 1;
+            background: #f1f5f9; /* Ochiq rangli chat fon */
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            scrollbar-width: thin;
+            scrollbar-color: #4f46e5 #f1f5f9;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.8) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .message.bot {
+            background: white;
+            color: #333;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .message.user {
+            background: #6366f1; /* User xabari uchun rang */
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+            box-shadow: 0 2px 5px rgba(99, 102, 241, 0.3);
+        }
+
+        .typing-indicator {
+            font-size: 0.8em;
+            color: #888;
+            margin-left: 10px;
+            font-style: italic;
+            display: none;
+        }
+
+        /* Chat Oynasi Pastki Qismi (Controls) */
+        .phone-footer {
+            padding: 10px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+
+        .quick-replies {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            margin-bottom: 5px;
+        }
+
+        .reply-btn {
+            background: #e0e7ff;
+            border: 1px solid #6366f1;
+            color: #4f46e5;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: 0.2s;
+            font-weight: 600;
+        }
+
+        .reply-btn:hover {
+            background: #6366f1;
+            color: white;
+        }
+
+        .input-area {
+            display: flex;
+            align-items: center;
+            background: #f1f5f9;
+            border-radius: 20px;
+            padding: 8px 15px;
+        }
+
+        .input-placeholder {
+            color: #999;
+            font-size: 0.9em;
+            flex: 1;
+        }
+        
+        .send-icon { color: #6366f1; font-weight: bold; }
+
+        .qr-code {
+            display: block;
+            margin: 10px auto;
+            width: 100px;
+            height: 100px;
+            border: 1px solid #ddd;
+            padding: 5px;
+            background-color: white;
+        }
+
+        /* Media Queries */
+        @media (max-width: 1000px) {
+            .problem-solution-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 1rem; }
+            .nav-links { gap: 1rem; }
+            .hero h2 { font-size: 2.5em; }
+            .chat-demo-section { padding: 30px 20px; text-align: center; }
+            .chat-demo-text { min-width: 100%; }
+            .phone-mockup { margin: 0 auto; width: 100%; max-width: 300px; height: 550px; }
+            .team-grid { grid-template-columns: 1fr; }
+            .roadmap-grid { flex-wrap: wrap; }
+            .roadmap-item { min-width: 45%; margin-bottom: 20px; }
+            .roadmap-item:nth-child(even) .roadmap-line { display: none; }
+            .roadmap-item:nth-child(odd) .roadmap-line { right: 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <h1> Operator Ai</h1>
+        <div class="nav-links">
+            <a href="#problem_solution"> Muammo & Yechim</a>
+            <a href="#team">Jamoa</a>
+            <a href="#why_us">Nega Biz?</a>
+            <a href="#roadmap">Roadmap</a>
+            <a href="#implementation">Amalga Oshirish</a>
+            <a href="#demo">Demo</a>
+        </div>
+    </div>
+
+    <!-- HERO SECTION -->
+    <div class="hero">
+        <h2>🎯 AI Navbat Boshqaruvi Tizimi (QMS)</h2>
+        <p>AI asosida qurilgan, real vaqtda ishlaydigan navbat boshqaruvi va optimizatsiya platformasi</p>
+    </div>
+
+    <div class="container">
+        
+        <!-- 1. MUAMMO VA YECHIM -->
+        <div class="section" id="problem_solution">
+            <h2>📌 Muammo va ✅ Yechim</h2>
+            
+            <h3>Muammo: Qaysi real muammoni hal qilmoqchisiz? (Dolzarblik)</h3>
+            <div class="problem-solution-grid">
+                <div class="problem-box">
+                    <h4>❌ O'zbekistonda uzoq va nazoratsiz navbatlar</h4>
+                    <p>Davlat va xususiy muassasalarda (bank, pasport xizmati, soliq xizmati, klinika) mijozlar ko'p vaqt navbatda o'tishga majbur. Bu fuqarolar vaqtini isrof qiladi.</p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>❌ Samarasizlik:</strong> Navbat uzunligini aniq bilishning iloji yo'q.</li>
+                        <li><strong>❌ Bashorat yo'q:</strong> Kutish vaqtini oldindan bashorat qilib bo'lmaydi.</li>
+                        <li><strong>❌ Optimal emas:</strong> Muassasalar navbatlarni optimal taqsimlay olmaydi.</li>
+                        <li><strong>❌ Xizmat sifati:</strong> Peak saatlarida xizmat sifati va fuqaro qoniqish darajasi tushadi.</li>
+                    </ul>
+                </div>
+                
+                <div class="solution-box">
+                    <h4>✅ IT Yechim: AI Navbat Boshqaruvi Tizimi</h4>
+                    <p>Real vaqtda ishlaydigan, AI asosida navbatlarni optimallashtiruvchi, kutish vaqtini hisobluvchi va fuqarolarga qulay onlayn xizmatni taqdim etuvchi platforma.</p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>✅ Online navbat:</strong> Chat-bot orqali tezkor va sodda navbat olish.</li>
+                        <li><strong>✅ AI Prediction:</strong> Ma'lumotlarga asoslangan kutish vaqti bashorati (&lt;85% Accuracy).</li>
+                        <li><strong>✅ Avtomatik optimallash:</strong> AI orqali eng optimal xizmat ko'rsatish oynasini tavsiya qilish.</li>
+                        <li><strong>✅ Real-vaqtli nazorat:</strong> Admin dashboard orqali navbat holatini kuzatish.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>🎯 Kutilayotgan Ta'sir:</h3>
+            <p>
+                Fuqarolar uchun **oyiga 5-10 soatgacha vaqt tejash**. Muassasalar uchun **xizmat ko'rsatish tezligini 30% oshirish** va "No-show" (kelmaslik) foizini 50% ga kamaytirish.
+            </p>
+        </div>
+
+        <!-- 2. JAMOAGA OID MA'LUMOT -->
+       <div class="section" id="team">
+    <h2> 👥 Jamoa Haqida Ma'lumot</h2>
+    <p>Bizning jamoa AI va mahsulotni boshqarish tajribasiga ega ikki a'zodan iborat.</p>
+    
+    <div class="team-grid">
+
+        <!-- 1 - Xamidov Xusniddin -->
+        <div class="team-member">
+            
+            <!-- RASM --> 
+            <img src="image.png" alt="Xamidov Xusniddin" 
+                 <img src="image.png"
+     alt="Xamidov Xusniddin"
+     style="
+        width:140px;
+        height:140px;
+        display:block;
+        margin:0 auto 15px auto;
+        border-radius:50%;
+        object-fit:cover;
+        border:2px solid #e0e0e0;
+     ">
+
+<h4 style="text-align:center;">👨‍💼 Xamidov Xusniddin</h4><span class="role" style="text-align:center; display:block;">🔴 Founder & Project Manager</span>
+
+            
+            <div class="skills-list">
+                <strong>Ko'nikmalari:</strong><br>
+                Product Management, Biznes Strategiya, Jamoa Boshqaruvi (Team Leadership), Stakeholder Relations
+            </div>
+            
+            <p style="margin-top: 10px;">
+                <strong>Vazifalar:</strong> Loyiha strategiyasi, Biznes modeli, Market research, Jamoa koordinatsiyasi.
+            </p>
+
+            <p><strong>Portfolio:</strong> 
+                <a href="https://www.linkedin.com/in/khusniddin-khamidov-53ab49360" style="color: #4f46e5;">LinkedIn</a> — 
+                <a href="https://github.com/KhamidovKhusniddin" style="color: #4f46e5;">GitHub</a>
+            </p>
+        </div>
+
+
+        <!-- 2 - Jumayev G'iyosjon -->
+         <!-- 1 - Xamidov Xusniddin -->
+        <div class="team-member">
+            
+            <!-- RASM --> 
+            <img src="image copy.png" alt="Jumayev G'iyosjon" 
+                 <img src="image copy.png"
+     alt="Jumayev G'iyosjon"
+     style="
+        width:140px;
+        height:140px;
+        display:block;
+        margin:0 auto 15px auto;
+        border-radius:50%;
+        object-fit:cover;
+        border:2px solid #e0e0e0;
+     ">
+
+         <h4 style="text-align:center;">👨‍💼 Jumayev G'iyosjon</h4><span class="role" style="text-align:center; display:block;">🔵 Backend Developer & AI/ML Engineer</span>
+    
+            <div class="skills-list">
+                <strong>Tech Stack:</strong><br>
+                Python, Flask/FastAPI, PostgreSQL, Machine Learning, TensorFlow, scikit-learn, Cloud services
+            </div>
+            
+            <p style="margin-top: 10px;">
+                <strong>Vazifalar:</strong> Backend arxitektura, Database dizayni, AI/ML algoritmlari (Prediction Model), API integratsiyasi.
+            </p>
+
+            <p><strong>Portfolio:</strong> 
+                <a href="https://www.linkedin.com/in/giyosjon-jumaev-65a536194/" style="color: #4f46e5;">LinkedIn</a> — 
+                <a href="https://github.com/GiyosjonJumayev" style="color: #4f46e5;">GitHub</a>
+            </p>
+        </div>
+
+    </div>
+</div>
+
+
+        <!-- 3. NEGA AYMAN BIZNING JAMOAMIZ BU MUAMMONI HAL QILA OLADI -->
+        <div class="section" id="why_us">
+            <h2>💪 Nega Aynan Bizning Jamoamiz?</h2>
+            
+            <h3>Kuchli tomonlarimiz:</h3>
+            <ul class="approach-list" style="margin-top: 0;">
+                <li><strong>✅ Amaliy Tajriba:</strong> Jamoa a'zolari B2B sektorida IT-yechimlarni amalga oshirish va backend integratsiyasida tajribaga ega.</li>
+                <li><strong>✅ AI Boshqaruvi:</strong> Asosiy muammoni hal qilish uchun Machine Learning modelini noldan yaratish va optimallashtirish bo'yicha kuchli ko'nikmalar mavjud.</li>
+                <li><strong>✅ Mahalliy Fokus:</strong> Biz O'zbekistondagi real muammoga (samarasiz navbatlar) e'tibor qaratganmiz, bu esa yechimning dolzarbligini oshiradi.</li>
+                <li><strong>✅ To'liq Qamrov:</strong> Loyiha boshqaruvi (PM) va Texnik (Backend/AI) rollarining mukammal kombinatsiyasi mavjud, bu esa g'oyani amaliy mahsulotga aylantirishga kafolat beradi.</li>
+            </ul>
+        </div>
+
+        <!-- 4. YO'L XARITASI & BOSQICH -->
+        <div class="section" id="roadmap">
+            <h2> 🗺️ Yo'l Xaritasi & Hozirgi Bosqich</h2>
+            
+            <h3>Hozirgi Bosqich: 🎯 Prototip/MVP</h3>
+            
+            <div class="roadmap-grid">
+                <!-- item 1 -->
+                <div class="roadmap-item active">
+                    <div class="roadmap-line"></div>
+                    <div class="roadmap-dot"></div>
+                    <div class="roadmap-status"> Q1  Hozirgi Bosqich</div>
+                    <p style="font-size: 0.9em; margin-top: 5px;"><strong>MVP</strong> (Demo WEB SITE) & Test sinovi uchun 3 tashkilot bilan muzokara.</p>
+                </div>
+                <!-- item 2 -->
+                <div class="roadmap-item">
+                    <div class="roadmap-line"></div>
+                    <div class="roadmap-dot"></div>
+                    <div class="roadmap-status">Q2 2025: Ishlab chiqish</div>
+                    <p style="font-size: 0.9em; margin-top: 5px;">Public launch, 5+ muassasa bilan integratsiya.</p>
+                </div>
+                <!-- item 3 -->
+                <div class="roadmap-item">
+                    <div class="roadmap-line"></div>
+                    <div class="roadmap-dot"></div>
+                    <div class="roadmap-status">Q3 2026: Miqyoslanish</div>
+                    <p style="font-size: 0.9em; margin-top: 5px;">50+ muassasa, Admin Dashboard v2 (Advanced Analytics).</p>
+                </div>
+                <!-- item 4 -->
+                <div class="roadmap-item">
+                    <div class="roadmap-line"></div>
+                    <div class="roadmap-dot"></div>
+                    <div class="roadmap-status">Q4 2026: Kengayish</div>
+                    <p style="font-size: 0.9em; margin-top: 5px;">Mobile App shakillantirish</p>
+                </div>
+            </div>
+            
+            <h3>📋 Keyingi Qadamlar (1-2 oy):</h3>
+            <ul style="margin-left: 20px; line-height: 2;">
+                <li>✅ Test sinovida loyihani tasdiqlash va shartnoma imzolash.</li>
+                <li>✅ Real tarixiy ma'lumotlar bilan AI modeli accuracy ni 85% ga yetkazish.</li>
+                <li>✅ Admin dashboardning asosiy funksiyalarini (kuzatuv va optimallashtirish) yakunlash.</li>
+                <li>✅ Foydalanuvchi interface ni tushunarli va osson qilish</li>
+            </ul>
+        </div>
+
+        <!-- 5. MUAMMONI QANDAY HAL QILMOQCHISIZ (Implementatsiya) -->
+        <div class="section" id="implementation">
+            <h2> 🔧 Muammoni Qanday Hal Qilmoqchisiz (Texnik Yondashuv)</h2>
+            
+            <h3>Rejadagi Asosiy Qadamlar:</h3>
+            <ol class="approach-list">
+                <li><strong>1-Qadam: Ma'lumotlarni yig'ish va tahlil qilish:</strong> Pilot muassasalardan tarixiy navbat va xizmat ko'rsatish vaqti ma'lumotlarini to'plash.</li>
+                <li><strong>2-Qadam: AI modelini o'qitish:</strong> Kutish vaqti (Waiting Time) va xizmat ko'rsatish vaqti (Service Time)ni bashorat qilish uchun Machine Learning modelini (Regression) ishlab chiqish.</li>
+                <li><strong>3-Qadam: Backend/API yaratish:</strong> Real-vaqtli navbat holatini kuzatish va navbatlarni optimallashtirish algoritmini ishga tushiruvchi barqaror serverni yaratish.</li>
+                <li><strong>4-Qadam: Frontend/Demo:</strong> Fuqaro uchun Chat-bot (Onlayn Navbat) va Muassasa uchun Admin Dashboard yaratish.</li>
+            </ol>
+
+            <h3>💻 Vositalar va Texnologik Stack:</h3>
+            <div class="tech-stack-grid">
+                <div class="tech-item">
+                    <h4>🔙 Backend</h4>
+                    <p>Python (Flask/FastAPI), PostgreSQL, Redis</p>
+                </div>
+                
+                <div class="tech-item">
+                    <h4>📱 Frontend</h4>
+                    <p>React.js (yoki HTML/CSS/JS), Real-time updates (WebSockets)</p>
+                </div>
+                
+                <div class="tech-item">
+                    <h4>📊 Data & ML</h4>
+                    <p>Pandas, NumPy, Matplotlib, TensorFlow/scikit-learn</p>
+                </div>
+                
+                <div class="tech-item">
+                    <h4>☁️ Cloud & DevOps</h4>
+                    <p>Docker, Kubernetes (miqyoslanish uchun)</p>
+                </div>
+            </div>
+            
+            <div class="ai-features-block">
+                <h3 style="margin-top: 0; padding-left: 0;">🤖 AI Texnologiyalaridan Qanday Foydalanishimiz:</h3>
+                
+                <p><strong>1. Kutish Vaqti Bashorati (ML Regression):</strong> Tarixiy va real vaqtli ma'lumotlarga (kun vaqti, xodim soni, xizmat turi, hozirgi navbat uzunligi) asoslanib, har bir yangi fuqaro uchun kutish vaqtini aniq bashorat qilish.</p>
+                <p><strong>2. Optimal Taqsimlash (Optimization Algorithm):</strong> AI modelidan foydalanib, fuqaroga eng qisqa kutish vaqtini beradigan xizmat ko'rsatish oynasini yoki optimal kelish vaqtini avtomatik tavsiya qilish.</p>
+                <p><strong>3. Peak Soatlar Tahlili (Time Series):</strong> Muassasalarga qaysi vaqtda eng ko'p mijoz kelishini va qancha xodim zarurligini oldindan bashorat qilish uchun vaqt qatorlari (Prophet) modellaridan foydalanish (Admin uchun muhim funksiya).</p>
+            </div>
+        </div>
+
+        <!-- CHAT BOT DEMO SECTION (ENG OXIRGI BO'LIM) -->
+        <div class="chat-demo-section" id="demo">
+            <div class="chat-demo-text">
+                <h2 style="font-size: 2.2em; color: #4f46e5;"> 🚀 AI Navbat Boshqaruvi Demo</h2>
+                <p>
+                    Navbat olish jarayonining qanchalik tez, aqlli va oson ekanligini sinab ko'ring. Navbatni oldindan **o'zingiz tanlagan vaqtga** bron qiling va QR kod oling.
+                </p>
+                <div style="margin-top: 30px;">
+                    <div style="display: flex; align-items: flex-start; margin-bottom: 15px; color: #333;">
+                        <span style="font-size: 1.5em; margin-right: 15px; color: #f97316;">⏱</span>
+                        <div>
+                            <strong>Oldindan Bron</strong>
+                            <p style="font-size: 0.9em; margin: 0; color: #555;">Kutishni emas, o'zingizga qulay vaqtni tanlang.</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: flex-start; color: #333;">
+                        <span style="font-size: 1.5em; margin-right: 15px; color: #10b981;">💳</span>
+                        <div>
+                            <strong>QR kod (Tasdiqlash)</strong>
+                            <p style="font-size: 0.9em; margin: 0; color: #555;">Muassasada navbatni faollashtirish uchun QR kod ishlatiladi.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PHONE SIMULATOR -->
+            <div class="phone-mockup">
+                <div class="phone-header">
+                    <div class="avatar">🤖</div>
+                    <div class="header-info">
+                        <h4>AI Yordamchi</h4>
+                        <span>Online • Hozir Javob Beradi</span>
+                    </div>
+                </div>
+                
+                <div class="chat-area" id="chatArea">
+                    <div class="message bot">
+                        Assalomu alaykum! AI Navbat tizimiga xush kelibsiz. Qanday yordam bera olaman? 😊
+                    </div>
+                </div>
+                <div class="typing-indicator" id="typingIndicator">Bot yozmoqda...</div>
+
+                <div class="phone-footer">
+                    <div class="quick-replies" id="quickReplies">
+                        <!-- Initial buttons loaded by JS on start -->
+                    </div>
+                    <div class="input-area">
+                        <div class="input-placeholder">Demo tugmalari orqali ishlating.</div>
+                        <div class="send-icon">➤</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <footer style="background: #1e293b; color: white; text-align: center; padding: 30px; margin-top: 50px;">
+        <p style="font-size: 1.1em; font-weight: bold;"></p>
+        <p style="margin-top: 10px; opacity: 0.7;">Jamoa: Xamidov Xusniddin • Jumayev G'iyosjon | 2025</p>
+    </footer>
+
+    <!-- JAVASCRIPT FOR CHAT SIMULATION -->
+    <script>
+        const chatArea = document.getElementById('chatArea');
+        const quickReplies = document.getElementById('quickReplies');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const timeSlots = ["09:30", "10:00", "11:15", "14:45"]; // Bron qilish uchun vaqtlar
+
+        // Sayt yuklanganda boshlang'ich tugmalarni yuklash
+        window.onload = () => {
+             updateButtons([
+                {text: '🎫 Navbat olish', action: 'start_queue'},
+                {text: '⏰ Vaqtni bilish', action: 'check_time'}
+            ]);
+        };
+
+        // Foydalanuvchi ko'rinishida xabar yuborish
+        function addUserMessage(text) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message user';
+            msgDiv.innerText = text;
+            chatArea.appendChild(msgDiv);
+            scrollToBottom();
+        }
+
+        // Bot xabar yuborishdan oldin yozish animatsiyasini ko'rsatish
+        function showTyping() {
+            typingIndicator.style.display = 'block';
+            scrollToBottom();
+        }
+
+        // Yozish animatsiyasini yashirish
+        function hideTyping() {
+            typingIndicator.style.display = 'none';
+        }
+
+        // Bot xabarini qo'shish (kechiktirish bilan)
+        function addBotMessage(text, delay = 1000) {
+            showTyping();
+            setTimeout(() => {
+                hideTyping();
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'message bot';
+                msgDiv.innerHTML = text;
+                chatArea.appendChild(msgDiv);
+                scrollToBottom();
+            }, delay);
+        }
+
+        // Tugmalarni yangilash
+        function updateButtons(buttons) {
+            quickReplies.innerHTML = '';
+            buttons.forEach(btn => {
+                const button = document.createElement('button');
+                button.className = 'reply-btn';
+                button.innerText = btn.text;
+                // 'action' bo'lsa uni ishlatamiz, aks holda 'text' ni.
+                button.onclick = () => userReply(btn.text, btn.action);
+                quickReplies.appendChild(button);
+            });
+        }
+
+        // Chat maydonini pastga surish
+        function scrollToBottom() {
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        // Foydalanuvchi javobi va bot mantig'i
+        function userReply(text, action = null) {
+            // Faqat tugmalar bosilganda xabar yuboriladi
+            if (text) {
+                addUserMessage(text);
+                quickReplies.innerHTML = ''; // Tugmalarni o'chirish
+            }
+
+            // --- Chat Mantiqi ---
+            
+            // 1. Bosh menyu
+            if (action === 'start_queue' || action === 'reset') {
+                const welcomeMsg = action === 'start_queue' ? "Qaysi xizmat turidan navbat olmoqchisiz?" : "Bosh menyuga qaytildi. Qanday yordam bera olaman?";
+                addBotMessage(welcomeMsg, 800);
+                setTimeout(() => {
+                    updateButtons([
+                        {text: '🏦 Bank Xizmatlari', action: 'select_time_bank'},
+                        {text: '🛂 Pasport Stol', action: 'select_time_passport'},
+                        {text: '📝 Notarius', action: 'select_time_notary'}
+                    ]);
+                }, 1000);
+            } 
+            
+            // 2. Vaqtni bilish
+            else if (action === 'check_time') {
+                addBotMessage("Navbat raqamingizni (Ticket ID) kiriting. Masalan: #B456", 800);
+                setTimeout(() => {
+                    updateButtons([
+                        {text: 'Mening raqamim: #A123', action: 'check_time_A123'},
+                        {text: 'Mening raqamim: #B456', action: 'check_time_B456'}
+                    ]);
+                }, 1000);
+            }
+            // Vaqtni bilish natijasi
+            else if (action && action.startsWith('check_time_')) {
+                const ticketID = action.split('_')[2];
+                addBotMessage(`Navbat raqamingiz: <strong>${ticketID}</strong> tahlil qilinmoqda.`, 1000);
+                setTimeout(() => {
+                    const time = ticketID === 'A123' ? 7 : 12;
+                    const people = ticketID === 'A123' ? 2 : 4;
+                    addBotMessage(`Sizning navbatingizgacha <strong>${people} ta odam</strong> bor. Taxminiy kutish vaqti: <strong>${time} daqiqa</strong>.`, 1500);
+                    
+                    setTimeout(() => {
+                        updateButtons([
+                            {text: 'Bosh menyuga qaytish', action: 'reset'}
+                        ]);
+                    }, 2000);
+                }, 1200);
+            }
+
+            // 3. Xizmat tanlandi, vaqtni tanlash
+            else if (action && action.startsWith('select_time_')) {
+                const service = text.split(' ')[0]; // Xizmat turi
+                addBotMessage(`Siz <strong>${service}</strong> ni tanladingiz. Iltimos, navbatga kelish uchun <strong>o'zingizga qulay vaqtni</strong> tanlang. AI quyidagi vaqtlarni tavsiya qilmoqda (eng qisqa kutish)`, 1000);
+
+                setTimeout(() => {
+                    const timeButtons = timeSlots.map(time => {
+                        return { text: `⏰ ${time}`, action: `book_time_${service}_${time}` };
+                    });
+                    updateButtons(timeButtons);
+                }, 1500);
+            }
+
+            // 4. Vaqt tanlandi, yakunlash va QR kod berish
+            else if (action && action.startsWith('book_time_')) {
+                const parts = action.split('_');
+                const service = parts[2];
+                const time = parts[3];
+                const ticketNum = service[0].toUpperCase() + Math.floor(Math.random() * 800) + 200;
+                
+                addBotMessage(`Vaqt: <strong>${time}</strong> ga muvaffaqiyatli bron qilindi. AI sizga eng mos oynani tanladi. 🧠`, 1000);
+                
+                setTimeout(() => {
+                    // QR kod uchun simulyatsiya tasvir URL
+                    const qrCodeUrl = `https://placehold.co/100x100/4f46e5/ffffff?text=${ticketNum}`;
+                    
+                    addBotMessage(`
+                        ✅ <strong>Navbat tasdiqlandi!</strong><br><br>
+                        🎫 Tilet Raqami: <strong>#${ticketNum}</strong><br>
+                        ⏱ Bron qilingan vaqt: <strong>${time}</strong><br>
+                        📍 Oyna Raqami: <strong>№${Math.floor(Math.random() * 5) + 1}</strong><br><br>
+                        <img src="${qrCodeUrl}" class="qr-code" alt="Navbat QR kodi">
+                        <br>
+                        <strong>Eslatma:</strong> Muassasaga kelganda navbatni faollashtirish uchun ushbu QR kodni skanerlang.
+                    `, 2000);
+                    
+                    setTimeout(() => {
+                        updateButtons([
+                            {text: 'Yangi navbat olish', action: 'start_queue'},
+                            {text: 'Tugadi', action: 'thanks'}
+                        ]);
+                    }, 4000);
+                }, 1500);
+            }
+
+            // 5. Rahmat
+            else if (action === 'thanks') {
+                addBotMessage("Xizmatimizdan foydalanganingiz uchun rahmat! Kuningiz xayrli o'tsin! 👋", 800);
+                 setTimeout(() => {
+                        updateButtons([
+                            {text: 'Boshidan boshlash', action: 'reset'}
+                        ]);
+                    }, 2000);
+            }
+        }
+    </script>
+</body>
+</html>
